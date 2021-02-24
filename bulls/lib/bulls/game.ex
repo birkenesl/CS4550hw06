@@ -16,21 +16,21 @@ defmodule Bulls.Game do
 
 
 
-  def repHelper(secretList, numList, bulls, cows) do
+  def repHelper(secretList, numList, bulls, cows, index) do
 
     cond do
-      Enum.empty?(numList) ->
+      index == 4 ->
         {bulls, cows}
       true ->
-        [secretHead | secretTail] = secretList
-        [numHead | numTail] = numList
+        currentNum = Enum.at(numList, index)
+        currentSec = Enum.at(secretList, index)
         cond do
-          secretHead === numHead ->
-            repHelper(secretTail, numTail, bulls + 1, cows)
-          Enum.member?(secretList, numHead) ->
-            repHelper(secretTail, numTail, bulls, cows + 1)
+          currentNum === currentSec ->
+            repHelper(secretList, numList, bulls + 1, cows, index + 1)
+          Enum.member?(secretList, currentNum) ->
+            repHelper(secretList, numList, bulls, cows + 1, index + 1)
           true ->
-            repHelper(secretTail, numTail, bulls, cows)
+            repHelper(secretList, numList, bulls, cows, index + 1)
         end
     end
 
@@ -71,11 +71,11 @@ defmodule Bulls.Game do
       bulls = elem(bullsAndCows, 0)
       cows = elem(bullsAndCows, 1)
       if number === st.secret do
-        %{ st | guesses: st.guesses ++ [number], winFlag: true,
+        %{ st | guesses: st.guesses ++ [Enum.join(split_integer(number))], winFlag: true,
          badFlag: false, bullreports: st.bullreports ++ [bulls],
          cowreports: st.cowreports ++ [cows]}
       else
-        %{ st | guesses: st.guesses ++ [number], badFlag: false,
+        %{ st | guesses: st.guesses ++ [Enum.join(split_integer(number))], badFlag: false,
          bullreports: st.bullreports ++ [bulls],
          cowreports: st.cowreports ++ [cows]}
       end
