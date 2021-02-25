@@ -75,15 +75,19 @@ function Play({state}) {
 
 function WonGame({reset}) {
   return (
-    <h2> You won! Press the button to restart</h2>
-    <button onClick={reset}>Reset</button>
+    <div>
+      <h2> You won! Press the button to restart</h2>
+      <button onClick={reset}>Reset</button>
+    </div>
   );
 }
 
 function LostGame({reset}) {
   return (
-    <h2> You lost. Press the button to restart</h2>
-    <button onClick={reset}>Reset</button>
+    <div>
+      <h2> You lost. Press the button to restart</h2>
+      <button onClick={reset}>Reset</button>
+    </div>
   );
 }
 

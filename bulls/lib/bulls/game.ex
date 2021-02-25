@@ -40,7 +40,7 @@ defmodule Bulls.Game do
 
     splitSecret = split_integer(st.secret)
     splitNum = split_integer(number)
-    repHelper(splitSecret, splitNum, 0, 0)
+    repHelper(splitSecret, splitNum, 0, 0, 0)
 
   end
 
@@ -102,8 +102,9 @@ defmodule Bulls.Game do
 
   # basically strips the secret from the state,
   # so we can return this to the browser
-  def view(st) do
+  def view(st, name) do
     %{
+      name: name,
       guesses: st.guesses,
       badFlag: st.badFlag,
       winFlag: st.winFlag,
