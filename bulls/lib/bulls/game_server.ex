@@ -20,8 +20,8 @@ defmodule Bulls.GameServer do
     GenServer.start_link(__MODULE__, game, name: reg(name))
   end
 
-  def guess(name, letter) do
-    GenServer.call(reg(name), {:guess, name, letter})
+  def guess(name, number) do
+    GenServer.call(reg(name), {:guess, name, number})
   end
 
   def peek(name) do

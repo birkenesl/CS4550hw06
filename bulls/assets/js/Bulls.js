@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import 'milligram';
 
-import {ch_join, ch_push, ch_reset, ch_login } from './socket';
+import {ch_join, ch_push, ch_reset, ch_login, ch_set } from './socket';
 
 function Play({state}) {
 
@@ -11,9 +11,7 @@ function Play({state}) {
   const [text, setText] = useState("");
 
 
-  function reset() {
-    ch_reset();
-  }
+
 
   // this function is attributed to Nat Tuck's lecture 4 class code
   function updateText(ev) {
@@ -52,25 +50,29 @@ function Play({state}) {
         <button onClick={reset}>Reset</button>
       </p>
         {warning}
-      <p>Guess 1: {state.guesses[0]}  Bulls: {state.bullreports[0]}
+      <p> {name} Guess 1:  {state.guesses[0]}  Bulls: {state.bullreports[0]}
       Cows: {state.cowreports[0]} </p>
-      <p>Guess 2: {state.guesses[1]}  Bulls: {state.bullreports[1]}
+      <p> {name} Guess 2: {state.guesses[1]}  Bulls: {state.bullreports[1]}
       Cows: {state.cowreports[1]} </p>
-      <p>Guess 3: {state.guesses[2]}  Bulls: {state.bullreports[2]}
+      <p> {name} Guess 3: {state.guesses[2]}  Bulls: {state.bullreports[2]}
       Cows: {state.cowreports[2]} </p>
-      <p>Guess 4: {state.guesses[3]}  Bulls: {state.bullreports[3]}
+      <p> {name} Guess 4: {state.guesses[3]}  Bulls: {state.bullreports[3]}
       Cows: {state.cowreports[3]} </p>
-      <p>Guess 5: {state.guesses[4]}  Bulls: {state.bullreports[4]}
+      <p> {name} Guess 5: {state.guesses[4]}  Bulls: {state.bullreports[4]}
       Cows: {state.cowreports[4]} </p>
-      <p>Guess 6: {state.guesses[5]}  Bulls: {state.bullreports[5]}
+      <p> {name} Guess 6: {state.guesses[5]}  Bulls: {state.bullreports[5]}
       Cows: {state.cowreports[5]} </p>
-      <p>Guess 7: {state.guesses[6]}  Bulls: {state.bullreports[6]}
+      <p> {name} Guess 7: {state.guesses[6]}  Bulls: {state.bullreports[6]}
       Cows: {state.cowreports[6]} </p>
-      <p>Guess 8: {state.guesses[7]}  Bulls: {state.bullreports[7]}
+      <p> {name} Guess 8: {state.guesses[7]}  Bulls: {state.bullreports[7]}
       Cows: {state.cowreports[7]} </p>
 
     </div>
   );
+}
+
+function reset() {
+  ch_reset();
 }
 
 function WonGame({reset}) {
@@ -94,6 +96,14 @@ function LostGame({reset}) {
 
 function Login() {
   const [name, setName] = useState("");
+  const [gameID, setGameID] = useState("");
+
+
+  function setup() {
+    ch_set(gameID);
+    ch_login(name);
+
+  }
 
   return (
     <div className="row">
@@ -101,9 +111,12 @@ function Login() {
         <input type="text"
                value={name}
                onChange={(ev) => setName(ev.target.value)} />
+        <input type="text"
+               value={gameID}
+               onChange={(ev) => setGameID(ev.target.value)} />
       </div>
       <div className="column">
-        <button onClick={() => ch_login(name)}>Join</button>
+        <button onClick={setup}>Join</button>
       </div>
     </div>
   );

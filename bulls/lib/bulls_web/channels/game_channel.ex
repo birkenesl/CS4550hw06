@@ -7,7 +7,7 @@ defmodule BullsWeb.GameChannel do
   @impl true
   def join("game:" <> name, payload, socket) do
     if authorized?(payload) do
-      GameServer.start(name) # name represents game name
+      GameServer.start(name)
       view = GameServer.peek(name)
       |> Game.view("")
       socket = assign(socket, :name, name)
@@ -20,8 +20,8 @@ defmodule BullsWeb.GameChannel do
   @impl true
   def handle_in("login", %{"name" => user}, socket) do
     socket = assign(socket, :user, user)
-    view = socket.assigns[:name]
-    |> GameServer.peek()
+    name = socket.assigns[:name]
+    view = GameServer.peek(name)
     |> Game.view(user)
     {:reply, {:ok, view}, socket}
   end
@@ -29,35 +29,33 @@ defmodule BullsWeb.GameChannel do
   @impl true
   def handle_in("guess", %{"number" => num}, socket) do
     user = socket.assigns[:user]
-    view = socket.assigns[:name]
-    |> GameServer.guess(num)
+    name = socket.assigns[:name]
+    view = GameServer.guess(name, num)
     |> Game.view(user)
-    IO.puts "before broadcast"
     broadcast(socket, "view", view)
-    IO.puts "after broadcast"
-
     {:reply, {:ok, view}, socket}
   end
 
   @impl true
   def handle_in("reset", _, socket) do
     user = socket.assigns[:user]
-    view = socket.assigns[:name]
-    |> GameServer.reset()
+    name = socket.assigns[:name]
+    view = GameServer.reset(name)
     |> Game.view(user)
     broadcast(socket, "view", view)
     {:reply, {:ok, view}, socket}
   end
 
-  #intercept ["view"]
 
-  #@impl true
-  #def handle_out("view", msg, socket) do
-    #user = socket.assigns[:user]
-    #msg = %{msg | name: user}
-    #push(socket, "view", msg)
-    #{:noreply, socket}
-  #end
+  intercept ["view"]
+
+  @impl true
+  def handle_out("view", msg, socket) do
+    user = socket.assigns[:user]
+    msg = %{msg | name: user}
+    push(socket, "view", msg)
+    {:noreply, socket}
+  end
 
 
   # Add authorization logic here as required.
