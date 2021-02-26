@@ -9,7 +9,6 @@ defmodule Bulls.Game do
       winFlag: false,
       bullreports: [],
       cowreports: [],
-
     }
 
   end

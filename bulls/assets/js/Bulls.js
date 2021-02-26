@@ -143,7 +143,7 @@ function Bulls() {
 
 
   useEffect(() => {
-    ch_join(setState);
+      ch_join(setState);
 
   })
 
