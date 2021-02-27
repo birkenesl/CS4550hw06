@@ -37,6 +37,10 @@ defmodule Bulls.GameServer do
     GenServer.call(reg(name), {:reset, name})
   end
 
+  def remove(name, user) do
+    GenServer.call(reg(name), {:remove, user})
+  end
+
   def ready(name, typePlayer, user) do
     GenServer.call(reg(name), {:ready, typePlayer, user})
   end
@@ -47,6 +51,12 @@ defmodule Bulls.GameServer do
 
   def handle_call({:reset, name}, _from, game) do
     game = Bulls.Game.new
+    #Bulls.BackupAgent.put(name, game)
+    {:reply, game, game}
+  end
+
+  def handle_call({:remove, user}, _from, game) do
+    game = Bulls.Game.remove(game, user)
     #Bulls.BackupAgent.put(name, game)
     {:reply, game, game}
   end

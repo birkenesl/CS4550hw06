@@ -28,7 +28,7 @@ defmodule BullsWeb.GameChannel do
   end
 
   @impl true
-  def handle_in("ready", %{"typePlayer" => typePlayer}, socket) do
+  def handle_in("ready", typePlayer, socket) do
     user = socket.assigns[:user]
     name = socket.assigns[:name]
     view = GameServer.ready(name, typePlayer, user)
@@ -52,6 +52,16 @@ defmodule BullsWeb.GameChannel do
     user = socket.assigns[:user]
     name = socket.assigns[:name]
     view = GameServer.reset(name)
+    |> Game.view(user)
+    broadcast(socket, "view", view)
+    {:reply, {:ok, view}, socket}
+  end
+
+  @impl true
+  def handle_in("leave", _, socket) do
+    user = socket.assigns[:user]
+    name = socket.assigns[:name]
+    view = GameServer.remove(name, user)
     |> Game.view(user)
     broadcast(socket, "view", view)
     {:reply, {:ok, view}, socket}

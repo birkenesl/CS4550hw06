@@ -47,6 +47,8 @@ export function ch_set(gameName) {
       console.log("Unable to join", resp)
     });
   channel.on("view", state_update);
+  channel.on("leave", state_update);
+
 }
 
 export function ch_join(cb) {
@@ -87,6 +89,22 @@ export function ch_ready(typePlayer) {
          });
 }
 
+export function ch_leave() {
+  channel.push("leave", {})
+         .receive("ok", state_update)
+         .receive("error", resp => {
+           console.log("Unable to reset", resp)
+        }
+         )
+         .leave();
+  //let stateClean = {
+    //name: "",
+    //users: [],
+    //winFlag: false,
+    //inProgress: false
+  //};
+  //state_update(stateClean)
+}
 
 
 

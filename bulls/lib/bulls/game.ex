@@ -84,16 +84,45 @@ defmodule Bulls.Game do
   end
 
   def ready(st, typePlayer, user) do
+
+    bool = Enum.all?(st.users, fn x ->
+      if x.name == user do
+        true
+
+      else
+         if x.type == "Observer" do
+           true
+         else
+           if x.type == "Player" && x.ready == "ready" do
+             true
+           else
+             false
+           end
+
+         end
+      end
+
+
+    end)
+
     userObj = Enum.find(st.users, defaultUser(), fn x -> x.name == user end)
     str = ""
     if (typePlayer) do
-      str = "Player"
+      %{ st | users: [%{userObj | type: "Player", ready: "ready"}
+      | Enum.reject(st.users,
+      fn x -> x.name == user end)], inProgress: bool}
     else
-      str = "Observer"
+      %{ st | users: [%{userObj | type: "Observer", ready: "ready"}
+      | Enum.reject(st.users,
+      fn x -> x.name == user end)], inProgress: bool}
     end
-    %{ st | users: [%{userObj | type: str, ready: "ready"}
-    | Enum.reject(st.users,
-    fn x -> x.name == user end)]}
+
+  end
+
+  def remove(st, user) do
+    %{st | users: [Enum.reject(st.users,
+     fn x -> x.name == user end)]}
+
   end
 
   def guess(st, number, user) do
@@ -152,7 +181,8 @@ defmodule Bulls.Game do
     %{
       name: name,
       users: st.users,
-      winFlag: st.winFlag
+      winFlag: st.winFlag,
+      inProgress: st.inProgress
     }
 
   end
