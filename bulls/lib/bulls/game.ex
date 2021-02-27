@@ -6,7 +6,7 @@ defmodule Bulls.Game do
   def new do
     %{
       secret: randomFourDigit([]),
-      users: [%{"test": %User{}}], # Map of user name => user object.
+      users: %{"test": %User{}}, # Map of user name => user object.
       # when sent to Bulls.js,
       winFlag: false # the logic for wins needs to be more thought out
     }
