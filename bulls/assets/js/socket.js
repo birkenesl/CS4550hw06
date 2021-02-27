@@ -22,8 +22,9 @@ let channel = null//socket.channel("game:SETUPCHANNEL", {});
 
 let state = {
   name: "",
-  users: {},
-  winFlag: false
+  users: [],
+  winFlag: false,
+  inProgress: false
 };
 
 let callback = null;

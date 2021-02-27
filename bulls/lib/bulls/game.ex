@@ -1,16 +1,29 @@
 defmodule Bulls.Game do
   # this module should compute things
 
-  alias Bulls.User
+  #alias Bulls.User
 
   def new do
     %{
       secret: randomFourDigit([]),
-      users: %{"test": %User{}}, # Map of user name => user object.
+      users: [], # Map of user name => user object.
       # when sent to Bulls.js,
-      winFlag: false # the logic for wins needs to be more thought out
+      winFlag: false,
+      inProgress: false # the logic for wins needs to be more thought out
     }
 
+  end
+
+  def defaultUser do
+    %{name: "",
+      guesses: [],
+      bullreports: [],
+      cowreports: [],
+      wins: 0,
+      losses: 0,
+      type: "Player",
+      ready: "not ready",
+      badFlag: false}
   end
 
 
@@ -64,9 +77,9 @@ defmodule Bulls.Game do
   end
 
   def addUser(st, user) do
-    %{ st | users: Map.put_new(st.users, user, %User{})}
-    # add user to game state,
-    # update users in state, by adding a new key:value
+    %{ st | users: [Enum.find(st.users,
+      %{defaultUser() | name: user}, fn x -> x.name == user end) | st.users] }
+    # add user to game state, if it is not already there
 
 
 
@@ -75,28 +88,33 @@ defmodule Bulls.Game do
   def guess(st, number, user) do
     IO.inspect(st)
     IO.inspect(st.users)
+    userObj = Enum.find(st.users, defaultUser(), fn x -> x.name == user end)
     if isNum?(number) && validateGuess(st, number) do
       number = String.to_integer(number)
       bullsAndCows = reportBullsAndCows(st, number)
       bulls = elem(bullsAndCows, 0)
       cows = elem(bullsAndCows, 1)
       if number === st.secret do
-        %{ st | users: Map.replace!(st.users, user, %{user
-        | guesses: Map.get(st.users, user).guesses ++ [Enum.join(split_integer(number))],
-         wins: Map.get(st.users, user).wins + 1,
-         badFlag: false, bullreports: Map.get(st.users, user).bullreports ++ [bulls],
-         cowreports: Map.get(st.users, user).cowreports ++ [cows]}), winFlag: true}
+        %{ st | users: [%{userObj | guesses: userObj.guesses
+        ++ [Enum.join(split_integer(number))],
+       wins: userObj.wins + 1, badFlag: false,
+       bullreports: userObj.bullreports ++ [bulls],
+       cowreports: userObj.cowreports ++ [cows]} | Enum.reject(st.users,
+        fn x -> x.name == user end)], winFlag: true}
       else
-        %{ st | users: Map.replace!(st.users, user, %{user
-        | guesses: Map.get(st.users, user).guesses ++ [Enum.join(split_integer(number))],
-         badFlag: false, bullreports: Map.get(st.users, user).bullreports ++ [bulls],
-         cowreports: Map.get(st.users, user).cowreports ++ [cows]})}
+        %{ st | users: [%{userObj | guesses: userObj.guesses
+        ++ [Enum.join(split_integer(number))], badFlag: false,
+       bullreports: userObj.bullreports ++ [bulls],
+       cowreports: userObj.cowreports ++ [cows]} | Enum.reject(st.users,
+        fn x -> x.name == user end)], winFlag: false}
       end
     else
-      %{ st | users: Map.replace!(st.users, user, %{user | badFlag: true})}
+      %{ st | users: [%{userObj | badFlag: true} | Enum.reject(st.users,
+      fn x -> x.name == user end)]}
     end
 
   end
+
 
 
 
@@ -111,7 +129,7 @@ defmodule Bulls.Game do
 
   def validateGuess(st, number) do
     numSet = MapSet.new(split_integer(number))
-    st.winFlag == false < 8 && MapSet.size(numSet) == 4
+    st.winFlag == false && MapSet.size(numSet) == 4
     && Enum.all?(numSet, fn x -> is_integer(x) end)
   end
 

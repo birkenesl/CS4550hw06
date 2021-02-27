@@ -3,22 +3,79 @@ import 'milligram';
 
 import {ch_join, ch_push, ch_reset, ch_login, ch_set } from './socket';
 
+
+
+function Setup({state}) {
+  let {name, users, winFlag, inProgress} = state;
+
+  let typePlayer = true;
+
+  var players = [];
+
+  for (const user in users) {
+
+    players.push(<p> {users[user].type} {users[user].name}
+       is {users[user].ready} </p>);
+  }
+
+  function readyUp() {
+    
+  }
+
+  function toggleType() {
+    typePlayer = !typePlayer;
+  }
+
+  return (
+    <div>
+      <h1> Lobby </h1>
+
+      <p> {players} </p>
+
+
+      <input type="checkbox" onClick={toggleType} />
+
+
+      <button onClick={readyUp}>Ready Up</button>
+
+
+
+
+    </div>
+
+
+
+  )
+
+
+}
+
+
 function Play({state}) {
 
-  let {name, users, winFlag} = state;
+  let {name, users, winFlag, inProgress} = state;
+
+
+  function check(obj) {
+    console.log(obj.name);
+    return obj.name === name;
+  }
+  let thisUser = users.find(check)
 
   // this usestate hook is being used for input.
   const [text, setText] = useState("");
 
-  console.log(users[name].guesses);
+
+
+  //console.log(thisUser.guesses);
   // not all of this will be used
-  let guesses = users[name].guesses;
-  let bullreports = users[name].bullreports;
-  let cowreports = users[name].cowreports;
-  let wins = users[name].wins;
-  let losses = users[name].losses;
-  let type = users[name].type;
-  let badFlag = users[name].badFlag;
+  let guesses = thisUser.guesses;
+  let bullreports = thisUser.bullreports;
+  let cowreports = thisUser.cowreports;
+  let wins = thisUser.wins;
+  let losses = thisUser.losses;
+  let type = thisUser.type;
+  let badFlag = thisUser.badFlag;
 
 
   // this function is attributed to Nat Tuck's lecture 4 class code
@@ -51,10 +108,10 @@ function Play({state}) {
   var i;
   var j;
   for (j = 0; j < users.length; j++) {
-    let user = users[j];
-    for (i = 0; i < user.guesses.length; i++) {
-      guessRows.push(<p> name: {user} Guess: {user.guesses[i]}
-      Bulls: {user.bullreports[i]} Cows: {user.cowreports[i]} </p>)
+
+    for (i = 0; i < users[j].guesses.length; i++) {
+      guessRows.push(<p> name: {users[j].name} Guess: {users[j].guesses[i]}
+      Bulls: {users[j].bullreports[i]} Cows: {users[j].cowreports[i]} </p>)
     }
 
   }
@@ -108,6 +165,7 @@ function Login() {
 
   function setup() {
     ch_set(gameID);
+
     ch_login(name);
 
   }
@@ -137,8 +195,9 @@ function Bulls() {
 
   const [state, setState] = useState({
     name: "",
-    users: {},
-    winFlag: false
+    users: [],
+    winFlag: false,
+    inProgress: false,
   });
 
 
@@ -157,6 +216,9 @@ function Bulls() {
   // temp logic
   if (state.name === "") {
     body = <Login />
+  }
+  else if (!state.inProgress) {
+    body = <Setup state={state}/>
   }
   else if (state.winFlag){
     body = <WonGame reset={reset}/>;
