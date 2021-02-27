@@ -23,7 +23,7 @@ let channel = null//socket.channel("game:SETUPCHANNEL", {});
 let state = {
   name: "",
   users: {},
-  
+  winFlag: false
 };
 
 let callback = null;

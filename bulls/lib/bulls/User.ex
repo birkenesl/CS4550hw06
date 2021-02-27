@@ -1,5 +1,6 @@
 defmodule Bulls.User do
 
+@derive Jason.Encoder
   defstruct guesses: [],
    bullreports: [],
    cowreports: [],

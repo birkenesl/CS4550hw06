@@ -10,16 +10,15 @@ function Play({state}) {
   // this usestate hook is being used for input.
   const [text, setText] = useState("");
 
-  thisUser = users.name;
-
+  console.log(users[name].guesses);
   // not all of this will be used
-  guesses = thisUser.guesses;
-  bullreports = thisUser.bullreports;
-  cowreports = thisUser.cowreports;
-  wins = thisUser.wins;
-  losses = thisUser.losses;
-  type = thisUser.type;
-  badFlag = thisUser.badFlag;
+  let guesses = users[name].guesses;
+  let bullreports = users[name].bullreports;
+  let cowreports = users[name].cowreports;
+  let wins = users[name].wins;
+  let losses = users[name].losses;
+  let type = users[name].type;
+  let badFlag = users[name].badFlag;
 
 
   // this function is attributed to Nat Tuck's lecture 4 class code
@@ -50,7 +49,9 @@ function Play({state}) {
 
   var guessRows = [];
   var i;
-  for (const user in users) {
+  var j;
+  for (j = 0; j < users.length; j++) {
+    let user = users[j];
     for (i = 0; i < user.guesses.length; i++) {
       guessRows.push(<p> name: {user} Guess: {user.guesses[i]}
       Bulls: {user.bullreports[i]} Cows: {user.cowreports[i]} </p>)
@@ -71,7 +72,7 @@ function Play({state}) {
       </p>
 
         {warning}
-      {guessRows}
+        {guessRows}
 
     </div>
   );

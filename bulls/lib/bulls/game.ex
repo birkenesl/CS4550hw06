@@ -6,7 +6,7 @@ defmodule Bulls.Game do
   def new do
     %{
       secret: randomFourDigit([]),
-      users: %{}, # Map of user name => user object.
+      users: [%{"test": %User{}}], # Map of user name => user object.
       # when sent to Bulls.js,
       winFlag: false # the logic for wins needs to be more thought out
     }
@@ -73,25 +73,27 @@ defmodule Bulls.Game do
   end
 
   def guess(st, number, user) do
+    IO.inspect(st)
+    IO.inspect(st.users)
     if isNum?(number) && validateGuess(st, number) do
       number = String.to_integer(number)
       bullsAndCows = reportBullsAndCows(st, number)
       bulls = elem(bullsAndCows, 0)
       cows = elem(bullsAndCows, 1)
       if number === st.secret do
-        %{ st | users: Map.replace(st.users, user, %{user
-        | guesses: st.users.user.guesses ++ [Enum.join(split_integer(number))],
-         wins: st.users.user.wins + 1,
-         badFlag: false, bullreports: st.users.user.bullreports ++ [bulls],
-         cowreports: st.users.user.cowreports ++ [cows]}), winFlag: true}
+        %{ st | users: Map.replace!(st.users, user, %{user
+        | guesses: Map.get(st.users, user).guesses ++ [Enum.join(split_integer(number))],
+         wins: Map.get(st.users, user).wins + 1,
+         badFlag: false, bullreports: Map.get(st.users, user).bullreports ++ [bulls],
+         cowreports: Map.get(st.users, user).cowreports ++ [cows]}), winFlag: true}
       else
-        %{ st | users: Map.replace(st.users, user, %{user
-        | guesses: st.users.user.guesses ++ [Enum.join(split_integer(number))],
-         badFlag: false, bullreports: st.users.user.bullreports ++ [bulls],
-         cowreports: st.users.user.cowreports ++ [cows]})}
+        %{ st | users: Map.replace!(st.users, user, %{user
+        | guesses: Map.get(st.users, user).guesses ++ [Enum.join(split_integer(number))],
+         badFlag: false, bullreports: Map.get(st.users, user).bullreports ++ [bulls],
+         cowreports: Map.get(st.users, user).cowreports ++ [cows]})}
       end
     else
-      %{ st | users: Map.replace(st.users, user, %{user | badFlag: true})}
+      %{ st | users: Map.replace!(st.users, user, %{user | badFlag: true})}
     end
 
   end
@@ -109,17 +111,18 @@ defmodule Bulls.Game do
 
   def validateGuess(st, number) do
     numSet = MapSet.new(split_integer(number))
-    st.winFlag == false && length(st.guesses) < 8 && MapSet.size(numSet) == 4
+    st.winFlag == false < 8 && MapSet.size(numSet) == 4
     && Enum.all?(numSet, fn x -> is_integer(x) end)
   end
 
   # basically strips the secret from the state,
   # so we can return this to the browser
   def view(st, name) do
+    #userMap = Enum.each(st.users, fn {k, v} -> {k, Map.from_struct(v)} end)
+
     %{
       name: name,
       users: st.users,
-      users: Enum.map(st.users, fn {k, v} -> {k, Map.from_struct(v)} end),
       winFlag: st.winFlag
     }
 
