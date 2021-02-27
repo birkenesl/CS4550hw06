@@ -23,6 +23,17 @@ defmodule BullsWeb.GameChannel do
     name = socket.assigns[:name]
     view = GameServer.adduser(name, user)
     |> Game.view(user)
+    broadcast(socket, "view", view)
+    {:reply, {:ok, view}, socket}
+  end
+
+  @impl true
+  def handle_in("ready", %{"typePlayer" => typePlayer}, socket) do
+    user = socket.assigns[:user]
+    name = socket.assigns[:name]
+    view = GameServer.ready(name, typePlayer, user)
+    |> Game.view(user)
+    broadcast(socket, "view", view)
     {:reply, {:ok, view}, socket}
   end
 

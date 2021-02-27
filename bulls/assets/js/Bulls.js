@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import 'milligram';
 
-import {ch_join, ch_push, ch_reset, ch_login, ch_set } from './socket';
+import {ch_join, ch_push, ch_reset, ch_login, ch_set, ch_ready} from './socket';
 
 
 
@@ -14,18 +14,20 @@ function Setup({state}) {
 
   for (const user in users) {
 
-    players.push(<p> {users[user].type} {users[user].name}
-       is {users[user].ready} </p>);
+    players.push
+    (<p> {users[user].type} {users[user].name} is {users[user].ready} </p>);
   }
 
   function readyUp() {
-    
+
+      ch_ready(typePlayer);
+
   }
 
   function toggleType() {
     typePlayer = !typePlayer;
   }
-
+  //<button onClick={leave}>Leave</button>
   return (
     <div>
       <h1> Lobby </h1>
@@ -37,6 +39,8 @@ function Setup({state}) {
 
 
       <button onClick={readyUp}>Ready Up</button>
+
+
 
 
 

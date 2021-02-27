@@ -81,8 +81,19 @@ defmodule Bulls.Game do
       %{defaultUser() | name: user}, fn x -> x.name == user end) | st.users] }
     # add user to game state, if it is not already there
 
+  end
 
-
+  def ready(st, typePlayer, user) do
+    userObj = Enum.find(st.users, defaultUser(), fn x -> x.name == user end)
+    str = ""
+    if (typePlayer) do
+      str = "Player"
+    else
+      str = "Observer"
+    end
+    %{ st | users: [%{userObj | type: str, ready: "ready"}
+    | Enum.reject(st.users,
+    fn x -> x.name == user end)]}
   end
 
   def guess(st, number, user) do

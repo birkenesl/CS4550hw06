@@ -79,6 +79,13 @@ export function ch_login(name) {
          });
 }
 
+export function ch_ready(typePlayer) {
+  channel.push("ready", typePlayer)
+         .receive("ok", state_update)
+         .receive("error", resp => {
+           console.log("Unable to ready up", resp)
+         });
+}
 
 
 
