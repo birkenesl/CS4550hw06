@@ -21,7 +21,7 @@ defmodule BullsWeb.GameChannel do
   def handle_in("login", %{"name" => user}, socket) do
     socket = assign(socket, :user, user)
     name = socket.assigns[:name]
-    view = GameServer.peek(name)
+    view = GameServer.adduser(name, user)
     |> Game.view(user)
     {:reply, {:ok, view}, socket}
   end
@@ -30,7 +30,7 @@ defmodule BullsWeb.GameChannel do
   def handle_in("guess", %{"number" => num}, socket) do
     user = socket.assigns[:user]
     name = socket.assigns[:name]
-    view = GameServer.guess(name, num)
+    view = GameServer.guess(name, num, user)
     |> Game.view(user)
     broadcast(socket, "view", view)
     {:reply, {:ok, view}, socket}

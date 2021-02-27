@@ -1,14 +1,14 @@
 defmodule Bulls.Game do
   # this module should compute things
 
+  alias Bulls.User
+
   def new do
     %{
       secret: randomFourDigit([]),
-      guesses: [],
-      badFlag: false,
-      winFlag: false,
-      bullreports: [],
-      cowreports: [],
+      users: %{}, # Map of user name => user object.
+      # when sent to Bulls.js,
+      winFlag: false # the logic for wins needs to be more thought out
     }
 
   end
@@ -63,26 +63,40 @@ defmodule Bulls.Game do
     end)
   end
 
-  def guess(st, number) do
+  def addUser(st, user) do
+    %{ st | users: Map.put_new(st.users, user, %User{})}
+    # add user to game state,
+    # update users in state, by adding a new key:value
+
+
+
+  end
+
+  def guess(st, number, user) do
     if isNum?(number) && validateGuess(st, number) do
       number = String.to_integer(number)
       bullsAndCows = reportBullsAndCows(st, number)
       bulls = elem(bullsAndCows, 0)
       cows = elem(bullsAndCows, 1)
       if number === st.secret do
-        %{ st | guesses: st.guesses ++ [Enum.join(split_integer(number))], winFlag: true,
-         badFlag: false, bullreports: st.bullreports ++ [bulls],
-         cowreports: st.cowreports ++ [cows]}
+        %{ st | users: Map.replace(st.users, user, %{user
+        | guesses: st.users.user.guesses ++ [Enum.join(split_integer(number))],
+         wins: st.users.user.wins + 1,
+         badFlag: false, bullreports: st.users.user.bullreports ++ [bulls],
+         cowreports: st.users.user.cowreports ++ [cows]}), winFlag: true}
       else
-        %{ st | guesses: st.guesses ++ [Enum.join(split_integer(number))], badFlag: false,
-         bullreports: st.bullreports ++ [bulls],
-         cowreports: st.cowreports ++ [cows]}
+        %{ st | users: Map.replace(st.users, user, %{user
+        | guesses: st.users.user.guesses ++ [Enum.join(split_integer(number))],
+         badFlag: false, bullreports: st.users.user.bullreports ++ [bulls],
+         cowreports: st.users.user.cowreports ++ [cows]})}
       end
     else
-      %{ st | badFlag: true}
+      %{ st | users: Map.replace(st.users, user, %{user | badFlag: true})}
     end
 
   end
+
+
 
   def isNum?(number) do
     try do
@@ -104,12 +118,9 @@ defmodule Bulls.Game do
   def view(st, name) do
     %{
       name: name,
-      guesses: st.guesses,
-      badFlag: st.badFlag,
-      winFlag: st.winFlag,
-      bullreports: st.bullreports,
-      cowreports: st.cowreports,
-
+      users: st.users,
+      users: Enum.map(st.users, fn {k, v} -> {k, Map.from_struct(v)} end),
+      winFlag: st.winFlag
     }
 
   end

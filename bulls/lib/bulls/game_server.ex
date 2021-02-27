@@ -16,16 +16,21 @@ defmodule Bulls.GameServer do
   end
 
   def start_link(name) do
-    game = Bulls.BackupAgent.get(name) || Bulls.Game.new()
+    #game = Bulls.BackupAgent.get(name) ||
+    game = Bulls.Game.new()
     GenServer.start_link(__MODULE__, game, name: reg(name))
   end
 
-  def guess(name, number) do
-    GenServer.call(reg(name), {:guess, name, number})
+  def guess(name, number, user) do
+    GenServer.call(reg(name), {:guess, name, number, user})
   end
 
   def peek(name) do
     GenServer.call(reg(name), {:peek, name})
+  end
+
+  def adduser(name, user) do
+    GenServer.call(reg(name), {:adduser, user})
   end
 
   def reset(name) do
@@ -38,17 +43,24 @@ defmodule Bulls.GameServer do
 
   def handle_call({:reset, name}, _from, game) do
     game = Bulls.Game.new
-    Bulls.BackupAgent.put(name, game)
+    #Bulls.BackupAgent.put(name, game)
     {:reply, game, game}
   end
 
-  def handle_call({:guess, name, number}, _from, game) do
-    game = Bulls.Game.guess(game, number)
-    Bulls.BackupAgent.put(name, game)
+  def handle_call({:guess, name, number, user}, _from, game) do
+    game = Bulls.Game.guess(game, number, user)
+    #Bulls.BackupAgent.put(name, game)
     {:reply, game, game}
   end
 
   def handle_call({:peek, _name}, _from, game) do
+    {:reply, game, game}
+  end
+
+  def handle_call({:adduser, user}, _from, game) do
+    game = Bulls.Game.addUser(game, user)
+    
+    #Bulls.BackupAgent.put(name, game)
     {:reply, game, game}
   end
 end

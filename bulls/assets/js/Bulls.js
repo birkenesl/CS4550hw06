@@ -5,12 +5,21 @@ import {ch_join, ch_push, ch_reset, ch_login, ch_set } from './socket';
 
 function Play({state}) {
 
-  let {name, guesses, badFlag, winFlag, bullreports, cowreports} = state;
+  let {name, users, winFlag} = state;
 
   // this usestate hook is being used for input.
   const [text, setText] = useState("");
 
+  thisUser = users.name;
 
+  // not all of this will be used
+  guesses = thisUser.guesses;
+  bullreports = thisUser.bullreports;
+  cowreports = thisUser.cowreports;
+  wins = thisUser.wins;
+  losses = thisUser.losses;
+  type = thisUser.type;
+  badFlag = thisUser.badFlag;
 
 
   // this function is attributed to Nat Tuck's lecture 4 class code
@@ -35,8 +44,18 @@ function Play({state}) {
 
   let warning = null;
 
-  if (state.badFlag) {
+  if (badFlag) {
     warning = <p> Input must be four unique digits! </p>;
+  }
+
+  var guessRows = [];
+  var i;
+  for (const user in users) {
+    for (i = 0; i < user.guesses.length; i++) {
+      guessRows.push(<p> name: {user} Guess: {user.guesses[i]}
+      Bulls: {user.bullreports[i]} Cows: {user.cowreports[i]} </p>)
+    }
+
   }
 
   return (
@@ -48,24 +67,11 @@ function Play({state}) {
                                         onKeyPress={keyPress}/>
         <button onClick={guess}>Guess</button>
         <button onClick={reset}>Reset</button>
+
       </p>
+
         {warning}
-      <p> {name} Guess 1:  {state.guesses[0]}  Bulls: {state.bullreports[0]}
-      Cows: {state.cowreports[0]} </p>
-      <p> {name} Guess 2: {state.guesses[1]}  Bulls: {state.bullreports[1]}
-      Cows: {state.cowreports[1]} </p>
-      <p> {name} Guess 3: {state.guesses[2]}  Bulls: {state.bullreports[2]}
-      Cows: {state.cowreports[2]} </p>
-      <p> {name} Guess 4: {state.guesses[3]}  Bulls: {state.bullreports[3]}
-      Cows: {state.cowreports[3]} </p>
-      <p> {name} Guess 5: {state.guesses[4]}  Bulls: {state.bullreports[4]}
-      Cows: {state.cowreports[4]} </p>
-      <p> {name} Guess 6: {state.guesses[5]}  Bulls: {state.bullreports[5]}
-      Cows: {state.cowreports[5]} </p>
-      <p> {name} Guess 7: {state.guesses[6]}  Bulls: {state.bullreports[6]}
-      Cows: {state.cowreports[6]} </p>
-      <p> {name} Guess 8: {state.guesses[7]}  Bulls: {state.bullreports[7]}
-      Cows: {state.cowreports[7]} </p>
+      {guessRows}
 
     </div>
   );
@@ -130,11 +136,8 @@ function Bulls() {
 
   const [state, setState] = useState({
     name: "",
-    guesses: [],
-    badFlag: false,
-    winFlag: false,
-    bullreports: [],
-    cowreports: [],
+    users: {},
+    winFlag: false
   });
 
 
@@ -150,18 +153,22 @@ function Bulls() {
   let body = null;
 
 
+  // temp logic
   if (state.name === "") {
     body = <Login />
-  }
-  else if (state.guesses.length < 8) {
-    body = <Play state={state} />;
   }
   else if (state.winFlag){
     body = <WonGame reset={reset}/>;
   }
-  else {
-    body = <LostGame reset={reset}/>;
+  else  {
+    body = <Play state={state} />;
   }
+
+
+
+  //else {
+    //body = <LostGame reset={reset}/>;
+  //}
 
   return (
     <div className="container">
